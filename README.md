@@ -16,9 +16,13 @@ StationSathi: navigation by time, not distance.
 Existing station maps only tell passengers where things are. StationSathi tells them whether they can do what they need and still catch their train. The passenger enters a PNR, and every route is planned around the train’s departure time.
 
  Time-budget plan: “You have 18 minutes.   Washroom + water + Platform 6 takes 11 minutes. You are safe.”
+ 
  Crowd-aware routes: live crowd density changes route weights, so the shortest path is not always the one suggested.
+ 
  Auto re-route: if the platform changes, the route and voice guidance update at once, with the added walking time shown.
+ 
  Route profiles: wheelchair, elderly, luggage, family and visually impaired passengers each get their own routing graph.
+ 
  Kiosk to phone handoff: the kiosk shows the route plus a QR code, and scanning it continues the route on the phone with no app install.
 
 ## Proposed Solution / Architecture Diagram
@@ -49,41 +53,64 @@ The system also exposes an API and deep link, so IRCTC and other railway apps ca
 
 Late passenger:
 gets the direct route to the platform with the time left.
+
 Platform change: 
 receives a new route and the extra time needed.
+
 Wheelchair or elderly passenger: 
 gets a step-free route, and a lift outage reroutes automatically.
+
 Visually impaired passenger: 
 uses Sound Trail with voice, spatial audio and vibration from entrance to coach.
+
 First-time traveller: 
 uses a kiosk and scans the QR code to carry the route on their phone.
+
 Family with luggage and children: 
 gets a low-crowd, stair-free path with a washroom or baby-care stop.
+
 Station staff: 
 update the map in minutes and view crowd bottlenecks.
+
 Emergency: 
 one tap shows the nearest exit, first aid and help desk.
 
 ## Technology Stack
 
 Passenger app and kiosk: React PWA (Vite), offline-first with Service Workers and IndexedDB
+
 Maps: GeoJSON indoor floor plans, MapLibre GL (2D), Three.js (3D)
+
 Routing: Dijkstra / A* with dynamic edge weights
+
 Backend: Node.js (Express) or Python FastAPI, with WebSocket for live re-routing
+
 Database: PostgreSQL + PostGIS for map graphs, Redis for live crowd and train data
+
 Location: QR/NFC anchor tags plus the Web Sensors API (accelerometer, gyroscope, magnetometer)
+
 Voice and haptics: Web Speech API, offline text-to-speech, Vibration API
+
 Crowd analytics: anonymous device and gate counts, with no personal data stored
+
 Staff panel: React admin dashboard with a map editor and versioned map patches
+
 Deployment: Docker, cloud hosting, CDN for map patches
 
 ## Dependencies
 
 NTES / IRCTC APIs for live train status, platform and coach position
+
 Official station floor plans or CAD files to build the digital twin
+
 One-time installation of QR/NFC anchor plates on pillars and signboards
+
 Station staff to maintain map patches when the layout changes
+
 Station Wi-Fi or mobile data for live updates (the app works offline from cached maps)
+
 A smartphone with a browser and motion sensors, or a kiosk
+
 Compliance with India’s DPDP Act (anonymous crowd data only)
+
 Approval from the railway apps team to embed the API or SDK
